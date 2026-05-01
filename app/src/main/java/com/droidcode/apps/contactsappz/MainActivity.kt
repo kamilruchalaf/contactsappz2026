@@ -5,37 +5,33 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.ui.draw.clip
-import coil3.compose.AsyncImage
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Devices.PIXEL_9_PRO
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import coil3.compose.AsyncImage
 import com.droidcode.apps.contactsappz.ui.theme.ContactsAppZTheme
 
 class MainActivity : ComponentActivity() {
@@ -44,7 +40,42 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             ContactsAppZTheme {
-                Greeting("test")
+                ContactsScreen()
+            }
+        }
+    }
+}
+
+val sampleFirstNames = listOf("John", "Jane", "Alice", "Bob", "Charlie", "Diana", "Edward", "Fiona", "George", "Hannah")
+val sampleLastNames = listOf("Doe", "Smith", "Brown", "Johnson", "Williams", "Jones", "Garcia", "Miller", "Davis", "Wilson")
+
+val sampleContacts = (1..100000).map { index ->
+    ContactData(
+        firstName = sampleFirstNames[index % sampleFirstNames.size],
+        lastName = sampleLastNames[index % sampleLastNames.size],
+        isFavorite = index % 5 == 0,
+        imageUrl = "https://picsum.photos/seed/$index/100/100"
+    )
+}
+
+@Composable
+fun ContactsScreen() {
+    Scaffold { paddingValues ->
+        LazyColumn(
+            modifier = Modifier.padding(paddingValues)
+        ) {
+            stickyHeader {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(MaterialTheme.colorScheme.surface)
+                ) {
+                    HeaderItem()
+                }
+            }
+//            item { HeaderItem() }
+            items(sampleContacts) { contact ->
+                ContactItem(data = contact)
             }
         }
     }
@@ -65,3 +96,96 @@ fun GreetingPreview() {
         Greeting("Android")
     }
 }
+
+@Composable
+fun HeaderItem() {
+    Text(
+//        modifier = Modifier
+//            .clickable {
+//                //
+//            }
+//            .padding(
+//                horizontal = 16.dp,
+//                vertical = 8.dp
+//            ),
+        text = stringResource(R.string.contacts),
+        color = MaterialTheme.colorScheme.primary,
+        style = MaterialTheme.typography.titleLarge
+    )
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun HeaderItemPreview() {
+    ContactsAppZTheme {
+        HeaderItem()
+    }
+}
+
+@Composable
+fun ContactItem(
+    data: ContactData
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(
+                horizontal = 16.dp,
+                vertical = 8.dp
+            ),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            AsyncImage(
+                model = data.imageUrl,
+                contentDescription = null,
+                modifier = Modifier
+                    .size(48.dp)
+                    .clip(CircleShape)
+//                    .clip(RoundedCornerShape(8.dp))
+                    .border(1.dp, MaterialTheme.colorScheme.outline, CircleShape)
+            )
+            Spacer(modifier = Modifier.size(4.dp))
+            Column {
+                Text(
+                    text = data.firstName
+                )
+//        Spacer(modifier = Modifier.size(4.dp))
+                Text(
+                    text = data.lastName
+                )
+            }
+        }
+        if (data.isFavorite) { // AnimatedVisibility
+            Icon(
+                imageVector = Icons.Default.Star,
+                contentDescription = null
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun ContactItemPreview() {
+    ContactsAppZTheme {
+        ContactItem(
+            data = ContactData(
+                firstName = "John",
+                lastName = "Doe",
+                isFavorite = true,
+                imageUrl = null
+            )
+        )
+    }
+}
+
+data class ContactData(
+    val firstName: String,
+    val lastName: String,
+    val isFavorite: Boolean,
+    val imageUrl: String? = null
+)
