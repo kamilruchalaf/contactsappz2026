@@ -1,11 +1,13 @@
 package com.droidcode.apps.contactsappz
 
 import android.os.Bundle
+import androidx.activity.compose.BackHandler
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,7 +19,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Icon
@@ -25,6 +26,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -60,9 +65,38 @@ val sampleContacts = (1..100000).map { index ->
 
 @Composable
 fun ContactsScreen() {
+    var selectedContact by remember { mutableStateOf<ContactData?>(null) }
+
+    if (selectedContact == null) {
+        ContactsList(
+            contacts = sampleContacts,
+            onContactClick = { contact -> selectedContact = contact }
+        )
+    } else {
+        BackHandler {
+            selectedContact = null
+        }
+
+        ContactDetailsView(
+            data = selectedContact!!.toDetailsData(),
+            onBackClick = { selectedContact = null },
+            onFavoriteClick = {},
+            onCallClick = {},
+            onEmailClick = {},
+            onEditClick = {}
+        )
+    }
+}
+
+@Composable
+private fun ContactsList(
+    contacts: List<ContactData>,
+    onContactClick: (ContactData) -> Unit,
+    modifier: Modifier = Modifier
+) {
     Scaffold { paddingValues ->
         LazyColumn(
-            modifier = Modifier.padding(paddingValues)
+            modifier = modifier.padding(paddingValues)
         ) {
             stickyHeader {
                 Box(
@@ -74,8 +108,11 @@ fun ContactsScreen() {
                 }
             }
 //            item { HeaderItem() }
-            items(sampleContacts) { contact ->
-                ContactItem(data = contact)
+            items(contacts) { contact ->
+                ContactItem(
+                    data = contact,
+                    onClick = { onContactClick(contact) }
+                )
             }
         }
     }
@@ -124,11 +161,13 @@ private fun HeaderItemPreview() {
 
 @Composable
 fun ContactItem(
-    data: ContactData
+    data: ContactData,
+    onClick: () -> Unit
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .clickable(onClick = onClick)
             .padding(
                 horizontal = 16.dp,
                 vertical = 8.dp
@@ -178,7 +217,19 @@ private fun ContactItemPreview() {
                 lastName = "Doe",
                 isFavorite = true,
                 imageUrl = null
-            )
+            ),
+            onClick = {}
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun ContactsScreenPreview() {
+    ContactsAppZTheme {
+        ContactsList(
+            contacts = sampleContacts.take(5),
+            onContactClick = {}
         )
     }
 }
@@ -189,3 +240,17 @@ data class ContactData(
     val isFavorite: Boolean,
     val imageUrl: String? = null
 )
+
+private fun ContactData.toDetailsData(): ContactDetailsData {
+    val normalizedName = "$firstName.$lastName".lowercase()
+
+    return ContactDetailsData(
+        name = "$firstName $lastName",
+        imageUrl = imageUrl,
+        relationship = if (isFavorite) "Ulubiony kontakt" else "Kontakt",
+        email = "$normalizedName@example.com",
+        phone = "+48 500 600 700",
+        city = "Krakow",
+        birthday = "9 czerwca"
+    )
+}
