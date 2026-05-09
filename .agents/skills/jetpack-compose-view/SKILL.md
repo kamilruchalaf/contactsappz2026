@@ -26,6 +26,8 @@ Uzywaj tego skilla, gdy zadaniem jest stworzenie albo zmiana widoku w Jetpack Co
 - Widok powinien byc sterowany parametrami lub stanem przekazanym z zewnatrz, a nie twardo zaszyta logika biznesowa.
 - Mniejsze fragmenty widoku, szczegolnie te powtarzalne albo mozliwe do uzycia w innych miejscach, powinny miec osobne composable z jasnymi parametrami i lambdami akcji.
 - Korzystaj z Theme aplikacji i tokenow dostepnych przez lokalny `MaterialTheme`/design system projektu. Kolory, typografie, ksztalty i spacing bierz z motywu lub istniejacych tokenow; unikaj lokalnie zaszytych wartosci, jesli da sie je wyrazic przez Theme aplikacji.
+- Przed dodaniem wlasnych kolorow, typografii, ksztaltow albo wymiarow sprawdz lokalne pliki motywu aplikacji oraz wspolne komponenty UI. Hardcoded wartosci wizualne stosuj tylko jako swiadomy wyjatek, gdy dany detal nie istnieje w motywie i jest potrzebny do wiernego odwzorowania projektu.
+- Style tekstu pobieraj z `MaterialTheme.typography`, kolory z `MaterialTheme.colorScheme` albo lokalnych tokenow design systemu, a ksztalty z `MaterialTheme.shapes` lub odpowiednikow projektu. Nie tworz lokalnych palet i typografii wewnatrz widoku, jesli aplikacja ma juz zdefiniowany motyw.
 - Preferuj gotowe androidowe komponenty Compose i Material/Material3 dostepne w projekcie przed tworzeniem wlasnych odpowiednikow. Wlasny komponent dodawaj dopiero wtedy, gdy istnieje realna potrzeba wynikajaca z design systemu, zachowania lub braku gotowego komponentu.
 - Gdy nie masz pewnosci, czy projekt ma juz odpowiedni komponent albo zaleznosc, najpierw sprawdz lokalny kod i android-cli zamiast zgadywac API.
 - Unikaj magicznych rozmiarow, gdy projekt ma tokeny wymiarow albo komponenty wspolne.

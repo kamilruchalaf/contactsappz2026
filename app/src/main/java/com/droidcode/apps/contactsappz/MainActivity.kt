@@ -2,8 +2,10 @@ package com.droidcode.apps.contactsappz
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -17,7 +19,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Icon
@@ -25,10 +26,15 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
@@ -60,22 +66,41 @@ val sampleContacts = (1..100000).map { index ->
 
 @Composable
 fun ContactsScreen() {
-    Scaffold { paddingValues ->
-        LazyColumn(
-            modifier = Modifier.padding(paddingValues)
-        ) {
-            stickyHeader {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(MaterialTheme.colorScheme.surface)
-                ) {
-                    HeaderItem()
+    var selectedContact by remember { mutableStateOf<ContactData?>(null) }
+
+    if (selectedContact != null) {
+        BackHandler {
+            selectedContact = null
+        }
+        ContactDetailsScreen(
+            state = selectedContact!!.toContactDetailsUiState(),
+            onBackClick = { selectedContact = null },
+            onFavoriteClick = {},
+            onCallClick = {},
+            onEmailClick = {},
+            onEditClick = {}
+        )
+    } else {
+        Scaffold { paddingValues ->
+            LazyColumn(
+                modifier = Modifier.padding(paddingValues)
+            ) {
+                stickyHeader {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(MaterialTheme.colorScheme.surface)
+                    ) {
+                        HeaderItem()
+                    }
                 }
-            }
 //            item { HeaderItem() }
-            items(sampleContacts) { contact ->
-                ContactItem(data = contact)
+                items(sampleContacts) { contact ->
+                    ContactItem(
+                        data = contact,
+                        onClick = { selectedContact = contact }
+                    )
+                }
             }
         }
     }
@@ -124,11 +149,14 @@ private fun HeaderItemPreview() {
 
 @Composable
 fun ContactItem(
-    data: ContactData
+    data: ContactData,
+    onClick: () -> Unit
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .clickable(onClick = onClick)
+            .testTag("contact-item-${data.firstName}-${data.lastName}")
             .padding(
                 horizontal = 16.dp,
                 vertical = 8.dp
@@ -178,7 +206,8 @@ private fun ContactItemPreview() {
                 lastName = "Doe",
                 isFavorite = true,
                 imageUrl = null
-            )
+            ),
+            onClick = {}
         )
     }
 }
@@ -188,4 +217,14 @@ data class ContactData(
     val lastName: String,
     val isFavorite: Boolean,
     val imageUrl: String? = null
+)
+
+private fun ContactData.toContactDetailsUiState() = ContactDetailsUiState(
+    name = "$firstName $lastName",
+    relation = "Kontakt",
+    email = "${firstName.lowercase()}.${lastName.lowercase()}@gmail.com",
+    phone = "+48 500 600 700",
+    city = "Krakow",
+    birthday = "9 czerwca",
+    imageUrl = imageUrl
 )
