@@ -25,7 +25,9 @@ Uzywaj tego skilla, gdy zadaniem jest stworzenie albo zmiana widoku w Jetpack Co
 
 - Widok powinien byc sterowany parametrami lub stanem przekazanym z zewnatrz, a nie twardo zaszyta logika biznesowa.
 - Mniejsze fragmenty widoku, szczegolnie te powtarzalne albo mozliwe do uzycia w innych miejscach, powinny miec osobne composable z jasnymi parametrami i lambdami akcji.
-- Korzystaj z Theme aplikacji i tokenow dostepnych przez lokalny `MaterialTheme`/design system projektu. Kolory, typografie, ksztalty i spacing bierz z motywu lub istniejacych tokenow; unikaj lokalnie zaszytych wartosci, jesli da sie je wyrazic przez Theme aplikacji.
+- Korzystaj z Theme aplikacji i tokenow dostepnych przez lokalny `MaterialTheme`/design system projektu. Kolory, style tekstow, typografie, ksztalty i spacing bierz z motywu lub istniejacych tokenow; unikaj lokalnie zaszytych wartosci, jesli da sie je wyrazic przez Theme aplikacji.
+- Teksty styluj przez `MaterialTheme.typography`, a kolory tekstow przez `MaterialTheme.colorScheme` albo tokeny design systemu. Lokalnych `Color(...)`, `fontSize`, `fontWeight` i podobnych wartosci uzywaj tylko wtedy, gdy projekt nie ma odpowiedniego tokenu albo wymaga tego wierne odwzorowanie unikalnego elementu makiety.
+- Jesli ikona jest taka sama albo bardzo podobna do ikony z Material Icons, uzyj `androidx.compose.material.icons`/`Icons.*` zamiast rysowania jej recznie w `Canvas`, SVG albo customowym komponencie. Wlasne ikony tworz tylko dla elementow niedostepnych w Material Icons albo specyficznych dla marki/makiety.
 - Preferuj gotowe androidowe komponenty Compose i Material/Material3 dostepne w projekcie przed tworzeniem wlasnych odpowiednikow. Wlasny komponent dodawaj dopiero wtedy, gdy istnieje realna potrzeba wynikajaca z design systemu, zachowania lub braku gotowego komponentu.
 - Gdy nie masz pewnosci, czy projekt ma juz odpowiedni komponent albo zaleznosc, najpierw sprawdz lokalny kod i android-cli zamiast zgadywac API.
 - Unikaj magicznych rozmiarow, gdy projekt ma tokeny wymiarow albo komponenty wspolne.
