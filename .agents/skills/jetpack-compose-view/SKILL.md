@@ -18,7 +18,7 @@ Uzywaj tego skilla, gdy zadaniem jest stworzenie albo zmiana widoku w Jetpack Co
 3. Jesli potrzebujesz doprecyzowac dostepne komponenty, zaleznosci, warianty builda, strukture modulu albo sposob uruchamiania weryfikacji, w pierwszej kolejnosci korzystaj z android-cli i lokalnych narzedzi Android/Gradle.
 4. Implementuj widok w Compose zgodnie z lokalnym stylem projektu. Granuluj UI na male, czytelne composable, gdy poprawia to czytelnosc, testowalnosc albo pozwala wydzielic elementy z potencjalem reuzywalnosci.
 5. Dla danych przykladowych uzywaj prostych fake modeli lub parametrow preview blisko widoku, chyba ze projekt ma juz dedykowane preview data.
-6. Zawsze dodaj `@Preview(showBackground = true)` dla tworzonego lub istotnie zmienianego widoku.
+6. Zawsze dodaj `@Preview(showBackground = true)` dla tworzonego lub istotnie zmienianego widoku. Preview musi byc opakowane lokalnym motywem aplikacji i miec reprezentatywne dane, a dla widokow ekranowych takze sensowne wymiary preview zblizone do docelowego urzadzenia, jesli pomaga to ocenic layout.
 7. Po zmianach uruchom mozliwie najwezsza sensowna weryfikacje: kompilacje modulu, testy jednostkowe albo przynajmniej statyczne sprawdzenie importow i skladni.
 
 ## Compose Rules
@@ -26,7 +26,9 @@ Uzywaj tego skilla, gdy zadaniem jest stworzenie albo zmiana widoku w Jetpack Co
 - Widok powinien byc sterowany parametrami lub stanem przekazanym z zewnatrz, a nie twardo zaszyta logika biznesowa.
 - Mniejsze fragmenty widoku, szczegolnie te powtarzalne albo mozliwe do uzycia w innych miejscach, powinny miec osobne composable z jasnymi parametrami i lambdami akcji.
 - Korzystaj z Theme aplikacji i tokenow dostepnych przez lokalny `MaterialTheme`/design system projektu. Kolory, typografie, ksztalty i spacing bierz z motywu lub istniejacych tokenow; unikaj lokalnie zaszytych wartosci, jesli da sie je wyrazic przez Theme aplikacji.
+- Dla kolorow elementow UI w pierwszej kolejnosci uzywaj semantycznych wartosci z `MaterialTheme.colorScheme`, np. `primary`, `onPrimary`, `background`, `onBackground`, `surfaceVariant`, `onSurfaceVariant`, `outline`, zamiast prywatnych stalych typu `Color(0x...)`. Lokalne kolory dopuszczaj tylko dla tresci ilustracyjnych, map, wykresow albo elementow scisle wynikajacych z makiety, ktorych nie ma w motywie.
 - Preferuj gotowe androidowe komponenty Compose i Material/Material3 dostepne w projekcie przed tworzeniem wlasnych odpowiednikow. Wlasny komponent dodawaj dopiero wtedy, gdy istnieje realna potrzeba wynikajaca z design systemu, zachowania lub braku gotowego komponentu.
+- Jesli ikona w makiecie przypomina standardowa ikone Material, uzywaj `material-icons`/`Icons.*` dostepnych w projekcie zamiast rysowania jej recznie w `Canvas` albo tworzenia lokalnego SVG. Wlasne ikony dodawaj tylko wtedy, gdy Material Icons nie ma odpowiedniego odpowiednika albo makieta wymaga niestandardowego znaku.
 - Gdy nie masz pewnosci, czy projekt ma juz odpowiedni komponent albo zaleznosc, najpierw sprawdz lokalny kod i android-cli zamiast zgadywac API.
 - Unikaj magicznych rozmiarow, gdy projekt ma tokeny wymiarow albo komponenty wspolne.
 - Elementy klikalne powinny przyjmowac lambdy `on...`.
